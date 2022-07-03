@@ -1,4 +1,4 @@
-from setuptools import setup,find_packages
+from setuptools import setup, find_packages
 from typing import List
 
 
@@ -9,12 +9,13 @@ def get_requirements_list() -> List[str]:
     """
     with open("requirements.txt") as file:
         reqt_list = file.readlines()
+        reqt_list = [reqt.replace("\n", "") for reqt in reqt_list]
         return reqt_list
 
 
 setup(
     name="housing project",
-    version="0.0.2",         # need to increment version whenever we update
+    version="0.0.3",         # need to increment version whenever update
     author="Eldos Thomas",
     description="house value prediction in CI/CD mode",
     packages=find_packages(),   # local packages created. eg: housing
