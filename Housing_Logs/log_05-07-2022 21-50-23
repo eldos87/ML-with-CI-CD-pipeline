@@ -1,0 +1,7 @@
+[2022-07-05 21:50:23,736] werkzeug - WARNING -  * Debugger is active!
+[2022-07-05 21:50:23,743] werkzeug - INFO -  * Debugger PIN: 770-599-107
+[2022-07-05 21:50:30,414] root - INFO - Testing started for exception
+[2022-07-05 21:50:30,414] root - INFO -  Error occurred in script: [ C:\Users\thomas\Desktop\ineuron\FSDS (Dec onwards, copy this folder)\Projects\Project1\ML-with-CI-CD-pipeline\app.py ] at 
+        try block line number: [13] and exception block line number: [16] 
+        error message: [Testing Exception]
+[2022-07-05 21:50:30,415] werkzeug - INFO - 127.0.0.1 - - [05/Jul/2022 21:50:30] "GET / HTTP/1.1" 200 -
