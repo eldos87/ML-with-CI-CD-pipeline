@@ -127,5 +127,8 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-.ipynb_checkpoints
-.ipynb
+
+# others
+*.ipynb_checkpoints
+*.ipynb
+artifact/
