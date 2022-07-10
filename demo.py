@@ -6,10 +6,9 @@ import sys
 
 def main():
     try:
-        # pipeline = Pipeline()
-        # pipeline.run_pipeline()
-        data_validation_config = Configuration().get_data_validation_config()
-        print(data_validation_config)
+        pipeline = Pipeline()
+        pipeline.run_pipeline()
+
     except Exception as e:
         logging.error(e)
         raise HousingException(e, sys) from e

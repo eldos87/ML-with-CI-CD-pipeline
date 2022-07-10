@@ -131,4 +131,5 @@ dmypy.json
 # others
 *.ipynb_checkpoints
 *.ipynb
+*.idea
 artifact/

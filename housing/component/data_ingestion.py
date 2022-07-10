@@ -98,4 +98,4 @@ class DataIngestion:
             raise HousingException(e, sys) from e
 
     def __del__(self):
-        logging.info("Data Ingestion log completed")
+        logging.info("Data Ingestion log completed \n\n")
