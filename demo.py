@@ -6,8 +6,10 @@ import sys
 
 def main():
     try:
-        pipeline = Pipeline()
-        pipeline.run_pipeline()
+        # pipeline = Pipeline()
+        # pipeline.run_pipeline()
+        data_transform_config = Configuration().get_data_transformation_config()
+        print(data_transform_config)
 
     except Exception as e:
         logging.error(e)
