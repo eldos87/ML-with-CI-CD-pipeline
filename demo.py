@@ -4,12 +4,13 @@ from housing.exception import HousingException
 from housing.logger import logging
 import sys
 
+
 def main():
     try:
-        pipeline = Pipeline()
-        pipeline.run_pipeline()
-        # data_transform_config = Configuration().get_data_transformation_config()
-        # print(data_transform_config)
+        # pipeline = Pipeline()
+        # pipeline.run_pipeline()
+        model_trainer_config = Configuration().get_model_evaluation_config()
+        print(model_trainer_config)
 
     except Exception as e:
         logging.error(e)
