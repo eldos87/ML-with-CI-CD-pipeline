@@ -6,14 +6,14 @@ grid_search:
     verbose: 2
 
 model_selection:
-  module_0:
+  model_0:
     class: LinearRegression
     module: sklearn.linear_model
     param_grid:
       fit_intercept:
         - True
         - False
-  module_1:
+  model_1:
     class: RandomForestRegressor
     module: sklearn.ensemble
     param_grid:

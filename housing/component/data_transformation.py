@@ -141,8 +141,8 @@ class DataTransformation:
             transformed_train_dir = self.data_transformation_config.transformed_train_dir
             transformed_test_dir = self.data_transformation_config.transformed_test_dir
 
-            train_file_name = os.path.basename(train_file_path)
-            test_file_name = os.path.basename(test_file_path)
+            train_file_name = os.path.basename(train_file_path).replace(".csv", ".npz")
+            test_file_name = os.path.basename(test_file_path).replace(".csv", ".npz")
 
             transformed_train_file_path = os.path.join(transformed_train_dir, train_file_name)
             transformed_test_file_path = os.path.join(transformed_test_dir, test_file_name)
@@ -169,7 +169,7 @@ class DataTransformation:
             raise HousingException(e, sys) from e
 
     def __del__(self):
-        return f"Data Transformation log compleeted! \n\n"
+        return f"Data Transformation log completed! \n\n"
 
 
 
