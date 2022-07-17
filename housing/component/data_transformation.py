@@ -148,8 +148,8 @@ class DataTransformation:
             transformed_test_file_path = os.path.join(transformed_test_dir, test_file_name)
 
             logging.info(f"Saving transformed training and testing array.")
-            save_numpy_array_data(file_path=transformed_train_dir, array_data=train_array)
-            save_numpy_array_data(file_path=transformed_test_dir, array_data=test_array)
+            save_numpy_array_data(file_path=transformed_train_file_path, array_data=train_array)
+            save_numpy_array_data(file_path=transformed_test_file_path, array_data=test_array)
 
             preprocessed_object_file_path = self.data_transformation_config.preprocessed_object_file_path
 
@@ -169,7 +169,7 @@ class DataTransformation:
             raise HousingException(e, sys) from e
 
     def __del__(self):
-        return f"Data Transformation log completed! \n\n"
+        logging.info(f"Data Transformation log completed! \n\n")
 
 
 

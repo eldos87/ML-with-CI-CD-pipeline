@@ -62,7 +62,7 @@ class DataIngestion:
             logging.info(f"Splitting data into train & test split")
             train_set = None
             test_set = None
-            splits = StratifiedShuffleSplit(n_splits=1, test_size=0.2)
+            splits = StratifiedShuffleSplit(n_splits=1, test_size=0.2, random_state=42)
             for train_indices, test_indices in splits.split(df, df['cat']):
                 train_set = df.loc[train_indices].drop('cat', axis=1)
                 test_set = df.loc[test_indices].drop('cat', axis=1)
@@ -98,4 +98,4 @@ class DataIngestion:
             raise HousingException(e, sys) from e
 
     def __del__(self):
-        logging.info("Data Ingestion log completed \n\n")
+        logging.info(f"Data Ingestion log completed \n\n")

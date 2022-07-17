@@ -49,6 +49,9 @@ def evaluate_regression_model(model_list: List, X_train: np.ndarray, y_train: np
         if metric_info_artifact is None:
             logging.info("No acceptable models found")
 
+        else:
+            logging.info(f"Chosen model : {metric_info_artifact.model_object}")
+
         return metric_info_artifact
 
     except Exception as e:
@@ -63,8 +66,10 @@ class ModelFactory:
             self.gs_module = self.model_config[GRID_SEARCH_KEY][GRID_SEARCH_MODULE_KEY]
             self.gs_class = self.model_config[GRID_SEARCH_KEY][GRID_SEARCH_CLASS_KEY]
             self.gs_params = dict(self.model_config[GRID_SEARCH_KEY][GRID_SEARCH_PARAMS_KEY])
-
             self.model_list = dict(self.model_config[MODEL_SELECTION_KEY])
+
+            self.initialized_model_list = None
+            self.grid_searched_model_list = None
 
         except Exception as e:
             raise HousingException(e, sys) from e
@@ -74,7 +79,7 @@ class ModelFactory:
         try:
             module = importlib.import_module(module_name)
             class_ref = getattr(module, class_name)
-            logging.info(f"{class_name} imported from {module}")
+            logging.info(f"{class_name} imported from {module_name}")
             return class_ref
 
         except Exception as e:
@@ -85,7 +90,7 @@ class ModelFactory:
         This function returns model details listed in model.yaml file
         """
         try:
-            initialized_model_list = []
+            self.initialized_model_list = []
             for model_number in self.model_list.keys():
                 model_details = self.model_list[model_number]
                 model_name = f"{model_details[MODEL_SELECTION_MODULE_KEY]}.{model_details[MODEL_SELECTION_CLASS_KEY]}"
@@ -98,8 +103,8 @@ class ModelFactory:
 
                 initialized_model = InitializedModel(model_number=model_number, model_name=model_name,
                                                      model_object=model, param_grid=param_grid)
-                initialized_model_list.append(initialized_model)
-            return initialized_model_list
+                self.initialized_model_list.append(initialized_model)
+            return self.initialized_model_list
 
         except Exception as e:
             raise HousingException(e, sys) from e
@@ -126,9 +131,9 @@ class ModelFactory:
             grid_search_cv = self.update_parameters_of_class(instance_ref=grid_search_cv,
                                                              parameter_data=self.gs_params)
 
-            logging.info(f"Starting cross validation on {type(initialized_model.model_object).__name__}")
+            logging.info(f"Starting grid search cross validation on {type(initialized_model.model_object).__name__}")
             grid_search_cv.fit(X, y)
-            logging.info(f"Completed cross validation on {type(initialized_model.model_object).__name__}")
+            logging.info(f"Completed grid search cross validation on {type(initialized_model.model_object).__name__}")
 
             grid_searched_model = GridSearchedModel(model_number=initialized_model.model_number,
                                                     model_object=initialized_model.model_object,
@@ -144,23 +149,23 @@ class ModelFactory:
 
     def perform_hyper_parameter_tuning(self, initialised_model_list: List, X, y) -> List[GridSearchedModel]:
         try:
-            grid_searched_model_list = []
+            self.grid_searched_model_list = []
             for initialized_model in initialised_model_list:
                 grid_searched_model = self.execute_grid_search(initialized_model, X, y)
-                grid_searched_model_list.append(grid_searched_model)
+                self.grid_searched_model_list.append(grid_searched_model)
 
             logging.info("Grid Search cross validation completed")
-            return grid_searched_model_list
+            return self.grid_searched_model_list
 
         except Exception as e:
             raise HousingException(e, sys) from e
 
-    # this function has not much importance since best model is chosen based on test set
-    @staticmethod
-    def get_best_model_on_training_set(grid_searched_model_list: List, base_accuracy) -> BestModel:
+    # This function don't have much importance since best model is always chosen based on test set
+    # Its just for model screening purpose only (like under fitting check)
+    def get_best_model_on_training_set(self, base_accuracy) -> BestModel:
         try:
             best_model = None
-            for gs_model in grid_searched_model_list:
+            for gs_model in self.grid_searched_model_list:
                 if gs_model.best_score > base_accuracy:
                     logging.info(f"Acceptable model found : {gs_model}")
                     base_accuracy = gs_model.best_score
@@ -168,7 +173,7 @@ class ModelFactory:
 
             if best_model is None:
                 logging.info(f"No acceptable models found")
-                raise Exception(f"None of the tested models has base accuracy: {base_accuracy}")
+                raise Exception(f"None of the tested models able to meet base accuracy: {base_accuracy}")
 
             logging.info(f"Best model : {best_model}")
             return best_model
@@ -179,15 +184,14 @@ class ModelFactory:
     def initiate_best_model_finder(self, X, y, base_accuracy=0.6) -> BestModel:
         try:
             logging.info("Started initialising model from config file")
-            initialized_model_list = self.get_initialized_model_list()
-            logging.info(f"Initialized model list: {initialized_model_list}")
+            self.initialized_model_list = self.get_initialized_model_list()
+            logging.info(f"Initialized model list: {self.initialized_model_list}")
 
-            grid_searched_model_list = self.perform_hyper_parameter_tuning(initialised_model_list=initialized_model_list,
+            self.grid_searched_model_list = self.perform_hyper_parameter_tuning(initialised_model_list=self.initialized_model_list,
                                                                            X=X, y=y)
 
-            best_model = self.get_best_model_on_training_set(grid_searched_model_list, base_accuracy)
+            best_model = self.get_best_model_on_training_set(base_accuracy)
             return best_model
 
         except Exception as e:
             raise HousingException(e, sys) from e
-

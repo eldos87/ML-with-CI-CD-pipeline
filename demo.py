@@ -7,10 +7,10 @@ import sys
 
 def main():
     try:
-        # pipeline = Pipeline()
-        # pipeline.run_pipeline()
-        model_trainer_config = Configuration().get_model_evaluation_config()
-        print(model_trainer_config)
+        pipeline = Pipeline()
+        pipeline.run_pipeline()
+        # model_trainer_config = Configuration().get_model_evaluation_config()
+        # print(model_trainer_config)
 
     except Exception as e:
         logging.error(e)
