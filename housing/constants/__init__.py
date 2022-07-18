@@ -66,31 +66,29 @@ MODEL_TRAINER_BASE_ACCURACY_KEY = "base_accuracy"
 MODEL_TRAINER_CONFIG_DIR_KEY = "model_config_dir"
 MODEL_TRAINER_CONFIG_FILE_NAME_KEY = "model_config_file_name"
 
-# Model Evaluation related variable
-MODEL_EVALUATION_ARTIFACT_DIR = "model_evaluation"
-MODEL_EVALUATION_CONFIG_KEY = "model_evaluation_config"
-MODEL_EVALUATION_FILE_NAME_KEY = "model_evaluation_file_name"
-
-# Model Pusher related variable
-MODEL_PUSHER_MODEL_EXPORT_DIR_KEY = "model_export_dir"
-MODEL_PUSHER_CONFIG_KEY = "model_pusher_config"
-
-# Grid Search related variable
-GRID_SEARCH_KEY = "grid_search"
-GRID_SEARCH_CLASS_KEY = "class"
-GRID_SEARCH_MODULE_KEY = "module"
-GRID_SEARCH_PARAMS_KEY = "params"
-
 MODEL_SELECTION_KEY = "model_selection"
 MODEL_SELECTION_MODULE_KEY = "module"
 MODEL_SELECTION_CLASS_KEY = "class"
 MODEL_SELECTION_PARAMS_KEY = "param_grid"
 
+GRID_SEARCH_KEY = "grid_search"
+GRID_SEARCH_CLASS_KEY = "class"
+GRID_SEARCH_MODULE_KEY = "module"
+GRID_SEARCH_PARAMS_KEY = "params"
+
+# Model Evaluation related variable
+MODEL_EVALUATION_ARTIFACT_DIR = "model_evaluation"
+MODEL_EVALUATION_CONFIG_KEY = "model_evaluation_config"
+MODEL_EVALUATION_FILE_NAME_KEY = "model_evaluation_file_name"
+
 BEST_MODEL_KEY = "best_model"
 HISTORY_KEY = "history"
 MODEL_PATH_KEY = "model_path"
 
+# Model Pusher related variable
+MODEL_PUSHER_MODEL_EXPORT_DIR_KEY = "model_export_dir"
+MODEL_PUSHER_CONFIG_KEY = "model_pusher_config"
 
-
-EXPERIMENT_DIR_NAME = "experiment"
+# Experiment related variable
+EXPERIMENT_DIR = "experiment"
 EXPERIMENT_FILE_NAME = "experiment.csv"

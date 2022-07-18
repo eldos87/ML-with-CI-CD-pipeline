@@ -6,15 +6,30 @@ from housing.component.model_evaluation import ModelEvaluation
 from housing.component.model_pusher import ModelPusher
 from housing.config.configuration import Configuration
 from housing.entity.artifact_entity import DataIngestionArtifact, DataValidationArtifact,\
-    DataTransformationArtifact, ModelTrainerArtifact, ModelEvaluationArtifact, ModelPusherArtifact
+    DataTransformationArtifact, ModelTrainerArtifact, ModelEvaluationArtifact, ModelPusherArtifact, Experiment
 from housing.exception import HousingException
 from housing.logger import logging
+from housing.constants import *
+from housing.util.util import *
+
 import sys
+import uuid
+import os
+import pandas as pd
+from threading import Thread
+from datetime import datetime
 
 
-class Pipeline:
-    def __init__(self, config: Configuration = Configuration()):
+class Pipeline(Thread):
+    experiment: Experiment = Experiment(*([None]*11))
+    experiment_file_path = None
+
+    def __init__(self, config: Configuration):
         try:
+            artifact_dir = config.training_pipeline_config.artifact_dir
+            os.makedirs(artifact_dir, exist_ok=True)
+            Pipeline.experiment_file_path = os.path.join(artifact_dir, EXPERIMENT_DIR, EXPERIMENT_FILE_NAME)
+            super().__init__(name="pipeline", daemon=False)
             self.config = config
 
         except Exception as e:
@@ -83,6 +98,27 @@ class Pipeline:
 
     def run_pipeline(self):
         try:
+            if Pipeline.experiment.running_status:
+                logging.info("Pipeline is already running")
+                return Pipeline.experiment
+
+            logging.info("Pipeline is starting!")
+            Pipeline.experiment = Experiment(experiment_id=str(uuid.uuid4()),
+                                             experiment_file_path=Pipeline.experiment_file_path,
+                                             running_status=True,
+                                             initialization_timestamp=self.config.time_stamp,
+                                             artifact_timestamp=self.config.time_stamp,
+                                             start_time=datetime.now(),
+                                             stop_time=None,
+                                             execution_time=None,
+                                             model_accuracy=None,
+                                             message="Pipeline started",
+                                             is_model_accepted=None
+                                             )
+
+            logging.info(f"Pipeline Experiment : {Pipeline.experiment}")
+            self.save_experiment()
+
             data_ingestion_artifact = self.start_data_ingestion()
             data_validation_artifact = self.start_data_validation(data_ingestion_artifact=data_ingestion_artifact)
             data_transformation_artifact = self.start_data_transformation(data_ingestion_artifact=data_ingestion_artifact,
@@ -94,7 +130,69 @@ class Pipeline:
             if model_evaluation_artifact.is_model_accepted:
                 model_pusher_artifact = self.start_model_pusher(model_evaluation_artifact=model_evaluation_artifact)
 
-            logging.info(f"Pipeline has completed")
+            logging.info("Pipeline is completed")
+            stop_time = datetime.now()
+            Pipeline.experiment = Experiment(experiment_id=Pipeline.experiment.experiment_id,
+                                             experiment_file_path=Pipeline.experiment_file_path,
+                                             running_status=False,
+                                             initialization_timestamp=self.config.time_stamp,
+                                             artifact_timestamp=self.config.time_stamp,
+                                             start_time=Pipeline.experiment.start_time,
+                                             stop_time=stop_time,
+                                             execution_time=stop_time - Pipeline.experiment.start_time,
+                                             model_accuracy=model_trainer_artifact.test_accuracy,
+                                             message="Pipeline completed",
+                                             is_model_accepted=model_evaluation_artifact.is_model_accepted
+                                             )
+
+            logging.info(f"Pipeline Experiment : {Pipeline.experiment}")
+            self.save_experiment()
 
         except Exception as e:
             raise HousingException(e, sys) from e
+
+    def run(self) -> None:
+        try:
+            self.run_pipeline()
+
+        except Exception as e:
+            raise HousingException(e, sys) from e
+
+    @classmethod
+    def save_experiment(cls):
+        try:
+            if Pipeline.experiment.experiment_id is not None:
+                experiment_data_dict = Pipeline.experiment._asdict()
+                experiment_data_dict = {key: [value] for key, value in experiment_data_dict.items()}
+                file_name = os.path.basename(Pipeline.experiment_file_path)
+                experiment_data_dict.update({"created_timestamp": [datetime.now()], "file_name": [file_name]})
+
+                experiment_df = pd.DataFrame(experiment_data_dict)
+
+                dir_name = os.path.dirname(Pipeline.experiment_file_path)
+                os.makedirs(dir_name, exist_ok=True)
+
+                if os.path.exists(Pipeline.experiment_file_path):
+                    experiment_df.to_csv(Pipeline.experiment_file_path, index=False, header=False, mode="a")
+                    logging.info("Experiment dataframe has appended")
+                else:
+                    experiment_df.to_csv(Pipeline.experiment_file_path, index=False, header=True, mode="w")
+                    logging.info("Experiment dataframe has created")
+            else:
+                logging.info("Please start experiment first before proceeding to save experiment")
+
+        except Exception as e:
+            raise HousingException(e, sys) from e
+
+    @classmethod
+    def get_experiment_status(cls) -> pd.DataFrame:
+        try:
+            if os.path.exists(Pipeline.experiment_file_path):
+                df = pd.read_csv(Pipeline.experiment_file_path)
+                return df.tail()
+            else:
+                return pd.DataFrame()
+
+        except Exception as e:
+            raise HousingException(e, sys) from e
+

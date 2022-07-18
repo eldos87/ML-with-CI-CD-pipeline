@@ -23,5 +23,11 @@ InitializedModel = namedtuple("InitializedModel", ["model_number", "model_name",
 
 GridSearchedModel = namedtuple("GridSearchedModel", ["model_number", "model_object", "best_model", "best_params",
                                                      "best_score"])
+
 BestModel = namedtuple("BestModel", ["model_number", "model_object", "best_model", "best_params",
                                                      "best_score"])
+
+Experiment = namedtuple("Experiment", ["experiment_id", "experiment_file_path", "running_status",
+                                       "initialization_timestamp", "artifact_timestamp",
+                                       "start_time", "stop_time", "execution_time", "model_accuracy",
+                                       "message", "is_model_accepted"])
