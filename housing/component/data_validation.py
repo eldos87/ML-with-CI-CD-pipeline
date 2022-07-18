@@ -123,10 +123,11 @@ class DataValidation:
             schema_cat_features = schema_file['domain_value']
 
             for column_name in schema_cat_features.keys():
-                if (sorted(schema_cat_features[column_name]) != sorted(train_df[column_name].unique())) or \
-                        (sorted(schema_cat_features[column_name]) != sorted(test_df[column_name].unique())):
+                if not (set(train_df[column_name].unique()).issubset(set(schema_cat_features[column_name])) or
+                        set(test_df[column_name].unique()).issubset(set(schema_cat_features[column_name]))):
                     message = f"Mismatch of categories in categorical features between schema file vs train/test file"
                     raise Exception(message)
+
             else:
                 logging.info(f"Categories in categorical features has validated")
 

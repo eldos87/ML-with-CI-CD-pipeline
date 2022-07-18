@@ -18,10 +18,8 @@ model_selection:
     module: sklearn.ensemble
     param_grid:
       max_depth:
+        - 3
         - 5
-        - 7
-        - 10
       n_estimators:
-        - 50
+        - 80
         - 100
-        - 150

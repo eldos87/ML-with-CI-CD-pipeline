@@ -18,6 +18,21 @@ def read_yaml_file(file_path: str) -> dict:
         raise HousingException(e, sys) from e
 
 
+def write_yaml_file(file_path: str, data: dict = None) -> None:
+    """
+    write yaml file using given data in dictionary format
+    """
+    try:
+        dir_name = os.path.dirname(file_path)
+        os.makedirs(dir_name, exist_ok=True)
+        with open(file_path, "w") as yaml_file:
+            if data is not None:
+                yaml.dump(data, yaml_file)
+
+    except Exception as e:
+        raise HousingException(e, sys) from e
+
+
 def load_dataframe(file_path: str) -> pd.DataFrame:
     """
     loading pandas dataframe from specified filepath
