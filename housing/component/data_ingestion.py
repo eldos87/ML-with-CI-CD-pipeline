@@ -43,7 +43,26 @@ class DataIngestion:
             os.makedirs(raw_dir)
             logging.info(f"Extracting tgz file: [{tgz_file_path}] into [{raw_dir}]")
             with tarfile.open(tgz_file_path) as tgz_file_obj:
-                tgz_file_obj.extractall(raw_dir)
+                def is_within_directory(directory, target):
+                    
+                    abs_directory = os.path.abspath(directory)
+                    abs_target = os.path.abspath(target)
+                
+                    prefix = os.path.commonprefix([abs_directory, abs_target])
+                    
+                    return prefix == abs_directory
+                
+                def safe_extract(tar, path=".", members=None, *, numeric_owner=False):
+                
+                    for member in tar.getmembers():
+                        member_path = os.path.join(path, member.name)
+                        if not is_within_directory(path, member_path):
+                            raise Exception("Attempted Path Traversal in Tar File")
+                
+                    tar.extractall(path, members, numeric_owner=numeric_owner) 
+                    
+                
+                safe_extract(tgz_file_obj, raw_dir)
             logging.info(f"tgz file has extracted into [{raw_dir}]")
 
         except Exception as e:
